@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const sharp = require('sharp');
 const fs = require('fs');
-const path = require('path');
 const User = require('../models/User');
 // const redisClient = require('../redisClient');
 
