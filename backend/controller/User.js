@@ -4,6 +4,9 @@ const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
 const User = require('../models/User');
+// const redisClient = require('../redisClient');
+
+const redisExpiration = process.env.REDIS_EXPIRATION;
 
 exports.Register = async (req, res) => {
     const { username, password, email } = req.body;
@@ -39,6 +42,8 @@ exports.Login = async (req, res) => {
         }
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+
+        // await redisClient.setEx(token, redisExpiration, JSON.stringify({ userId: user._id }));
 
         res.status(200).json({ message: 'Login successful', token });
     } catch (error) {
@@ -88,3 +93,15 @@ exports.updateProfile = async (req, res) => {
         res.status(500).json({ error: error?.message || 'Failed to update profile image' });
     }
 };
+
+exports.logout = async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        // if (token) await redisClient.del(token);
+        res.status(200).json({ message: "Logged out" });
+    }
+    catch (error) {
+        console.error('Error during logout:', error);
+        return res.status(500).json({ error: 'Failed to logout' });
+    }
+}

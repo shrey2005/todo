@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Loader } from 'lucide-react';
+import { Mail, Lock, Loader, LogIn } from 'lucide-react';
 import { useAuth } from '../store/useAuth';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -39,46 +39,83 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center">
-            <div className="w-full max-w-md bg-gray-900 bg-opacity-70 rounded-xl shadow-lg">
-                <div className="p-8">
-                    <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-500 text-transparent bg-clip-text">
-                        Welcome Back
-                    </h2>
-
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                        <div className="relative mb-6">
-                            <div className="absolute inset-y-0 flex items-center pl-3 pointer-events-none">
-                                <Mail className="size-5 text-green-500 " />
-                            </div>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-4">
+            <div className="w-full max-w-md bg-white shadow-xl p-8">
+                <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold mb-2 text-gray-800">Welcome Back</h2>
+                    <p className="text-gray-600">Sign in to your account</p>
+                </div>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                    <div>
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                            Email Address
+                        </label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                             <input
                                 type="email"
                                 placeholder="Email Address"
                                 {...register('email')}
-                                className="w-full pl-10 pr-3 py-2 bg-gray-800 bg-opacity-50 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-500 text-white placeholder-gray-400 transition duration-200"
+                                className="w-full pl-10 pr-4 py-2 bg-white/10 border border-indigo-400 text-black rounded-md placeholder-gray-300 focus:ring-2 focus:ring-indigo-300 outline-none"
                             />
                         </div>
-                        <div className="relative mb-6">
-                            <div className="absolute inset-y-0 flex items-center pl-3 pointer-events-none">
-                                <Lock className="size-5 text-green-500 " />
-                            </div>
+                        {formError?.email && <p className="mt-1 text-sm text-red-600">{formError?.email?.message}</p>}
+                    </div>
+                    {/* <div className="relative mb-6">
+                        <div className="absolute inset-y-0 flex items-center pl-3 pointer-events-none">
+                            <Mail className="size-5 text-green-500 " />
+                        </div>
+                        <input
+                            type="email"
+                            placeholder="Email Address"
+                            {...register('email')}
+                            className="w-full pl-10 pr-3 py-2 bg-gray-800 bg-opacity-50 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-500 text-white placeholder-gray-400 transition duration-200"
+                        />
+                    </div> */}
+
+                    <div>
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                            Password
+                        </label>
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                             <input
                                 type="password"
                                 placeholder="Password"
                                 {...register('password')}
-                                className="w-full pl-10 pr-3 py-2 bg-gray-800 bg-opacity-50 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-500 text-white placeholder-gray-400 transition duration-200"
+                                className="w-full pl-10 pr-4 py-2 bg-white/10 border border-indigo-400 text-black rounded-md placeholder-gray-300 focus:ring-2 focus:ring-indigo-300 outline-none"
                             />
                         </div>
-                        <button
-                            className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-lg
-                            shadow-lg hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500
-                            focus:ring-offset-2 focus:ring-offset-gray-900 transition duration-200"
-                            type="submit"
-                        >
-                            {isLoading ? <Loader className="w-6 h-6 animate-spin mx-auto" /> : 'Login'}
-                        </button>
-                    </form>
-                </div>
+                    </div>
+                    {/* <div className="relative mb-6">
+                        <div className="absolute inset-y-0 flex items-center pl-3 pointer-events-none">
+                            <Lock className="size-5 text-green-500 " />
+                        </div>
+                        <input
+                            type="password"
+                            placeholder="Password"
+                            {...register('password')}
+                            className="w-full pl-10 pr-3 py-2 bg-gray-800 bg-opacity-50 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-500 text-white placeholder-gray-400 transition duration-200"
+                        />
+                    </div> */}
+                    <button
+                        className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                        disabled={isLoading}
+                        type="submit"
+                    >
+                        {isLoading ? (
+                            <>
+                                <Loader className="w-5 h-5 animate-spin mr-2" />
+                                Signing In...
+                            </>
+                        ) : (
+                            <>
+                                <LogIn className="w-5 h-5 mr-2" />
+                                Sign In
+                            </>
+                        )}
+                    </button>
+                </form>
                 <div className="px-8 py-4 flex justify-center">
                     <p className="text-sm text-gray-400">
                         Don't have an account?{' '}

@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import Register from './page/Register';
 import Login from './page/Login';
 import Dashboard from './page/Dashboard';
 import Navbar from './components/Navbar';
 import ProfilePage from './page/Profile';
 import { getToken } from './constant';
-
 export const ProtectedRoute = ({ children }) => {
     const token = getToken();
     if (!token) {
@@ -18,6 +18,7 @@ export const ProtectedRoute = ({ children }) => {
 function App() {
     return (
         <Router>
+            <ToastContainer />
             <Routes>
                 <Route path="/register" element={<Register />} />
                 <Route path="/" element={<Login />} />

@@ -1,6 +1,7 @@
 const Task = require('../models/Task');
 const sendEmail = require('../utils/mailer');
-const Papa = require('papaparse');
+const dayjs = require('dayjs');
+const { writeToStream } = require('@fast-csv/format');
 
 exports.createTask = async (req, res) => {
     const { title, description, status, dueDate } = req.body;
@@ -70,11 +71,15 @@ exports.updateTask = async (req, res) => {
             });
         }
 
+        const io = req.app.get('io');
+
         const task = await Task.findOneAndUpdate({ _id: req.params.id, userId: req.user._id }, update, { new: true });
 
         if (!task) {
             return res.status(404).send('Task not found');
         }
+
+        io.emit('taskStatusUpdated', { message: 'Task updated successfully', title: task.title, status: task.status });
 
         res.status(200).json({ message: 'Task updated successfully' });
     } catch (error) {
@@ -101,21 +106,31 @@ exports.downloadTask = async (req, res) => {
     try {
         const tasks = await Task.find({ userId: req.user._id });
 
-        const csvData = Papa.unparse(tasks.map(task => ({
-            id: task._id,
-            title: task.title,
-            description: task.description,
-            status: task.status,
-            dueDate: task.dueDate,
-            file: task.file,
-        })));
-
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', 'attachment; filename=tasks.csv');
-        // res.attchement('tasks-report.csv');
-        res.status(200).send(csvData);
+
+        const csvData = tasks.map((task) => ({
+            'Task Id': task._id,
+            Title: task.title,
+            Status: task.status,
+            'Created Date': dayjs(task.createdAt).format('YYYY-MM-DD'),
+        }));
+
+        const csvStream = writeToStream(res, csvData, {
+            headers: ['Task Id', 'Title', 'Status', 'Created Date'],
+            writeHeaders: true,
+        });
+
+        csvStream.on('error', (error) => {
+            console.log('Error during csv generation : ', error);
+            res.status(500).end();
+        });
+
+        csvStream.on('end', () => {
+            res.end();
+        });
     } catch (error) {
         console.log('Error during downloading task : ', error);
         res.status(500).json({ error: error?.message || 'Internal server error' });
     }
-}
+};

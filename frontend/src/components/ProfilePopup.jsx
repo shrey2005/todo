@@ -4,25 +4,25 @@ export default function ProfilePopup({ onClose }) {
     const navigate = useNavigate();
 
     return (
-        <div className="absolute right-0 top-10 bg-white shadow-md rounded-md w-32 text-black z-10">
-            <ul>
+        <div className="absolute right-0 top-12 bg-white border border-gray-200 rounded-lg w-40 shadow-lg z-20">
+            <ul className="divide-y divide-gray-100">
                 <li
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                    className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors rounded-t-lg"
                     onClick={() => {
                         navigate('/profile');
                         onClose();
                     }}
                 >
-                    Profile
+                    <span className="font-medium text-gray-800">Profile</span>
                 </li>
                 <li
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                    className="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors rounded-b-lg"
                     onClick={() => {
-                        navigate('/login');
-                        localStorage.remove();
+                        navigate('/');
+                        localStorage.clear();
                     }}
                 >
-                    Logout
+                    <span className="font-medium text-gray-800">Logout</span>
                 </li>
             </ul>
         </div>

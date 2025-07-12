@@ -7,6 +7,7 @@ export const useAuth = create((set) => ({
     user: null,
     profile: null,
     isAuthenticated: null,
+    error: null,
     isLoading: false,
     isChecking: true,
 
@@ -15,7 +16,7 @@ export const useAuth = create((set) => ({
 
         try {
             const signUpResponse = await axios.post(`${API_URL}/auth/register`, payload);
-            set({ user: signUpResponse.data.user, isAuthenticated: true, isLoading: false });
+            set({ user: signUpResponse.data.user, isAuthenticated: true, isLoading: false, error: null });
             toast.success('Signup successful! 🎉 Welcome aboard!');
             return true;
         } catch (error) {
@@ -31,11 +32,25 @@ export const useAuth = create((set) => ({
         try {
             const loginResponse = await axios.post(`${API_URL}/auth/login`, payload);
             localStorage.setItem('token', loginResponse.data.token);
-            set({ user: loginResponse.data.user, isAuthenticated: true, isLoading: false });
-            toast.success('Logged in successfully! 🎉 Welcome aboard!');
+            set({ user: loginResponse.data.user, isAuthenticated: true, isLoading: false, error: null });
+            // toast.success('Logged in successfully! 🎉 Welcome aboard!');
         } catch (error) {
             set({ error: error.response.data.message || 'Error Logging in', isLoading: false });
             toast.error(error.response.data.message || 'Error Logging in');
+        }
+    },
+
+    logout :async()=> {
+        set({ user: null, isAuthenticated: false, profile: null });
+        try {
+            const logoutResponse = await axios.post(`${API_URL}/auth/logout`, {}, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+            });
+            localStorage.removeItem('token');
+            toast.success('Logged out successfully! 👋 See you soon!');
+        } catch (error) {
+            set({ error: error.response.data.message || 'Error Logging out' });
+            toast.error(error.response.data.message || 'Error Logging out');
         }
     },
 
