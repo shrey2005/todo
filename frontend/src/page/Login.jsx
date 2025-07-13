@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Loader, LogIn } from 'lucide-react';
@@ -9,6 +10,12 @@ const Login = () => {
     const { isLoading, error, login } = useAuth();
     const navigate = useNavigate();
 
+    useEffect(() => {
+        if (error === false) {
+            navigate('/dashboard');
+        }
+    }, [error, navigate]);
+
     const schema = yup.object().shape({
         email: yup.string().required('Email is required').email('Invalid email address'),
         password: yup.string().required('Password is required').min(6, 'Password must be at least 6 characters'),
@@ -17,22 +24,18 @@ const Login = () => {
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors: formError },
     } = useForm({
         resolver: yupResolver(schema),
     });
 
     const onSubmit = async (formData) => {
-        const payload = {
-            email: formData.email,
-            password: formData.password,
-        };
         try {
+            const payload = {
+                email: formData.email,
+                password: formData.password,
+            };
             await login(payload);
-            if (!error) {
-                navigate('/dashboard');
-            }
         } catch (error) {
             console.log(error);
         }
@@ -61,17 +64,6 @@ const Login = () => {
                         </div>
                         {formError?.email && <p className="mt-1 text-sm text-red-600">{formError?.email?.message}</p>}
                     </div>
-                    {/* <div className="relative mb-6">
-                        <div className="absolute inset-y-0 flex items-center pl-3 pointer-events-none">
-                            <Mail className="size-5 text-green-500 " />
-                        </div>
-                        <input
-                            type="email"
-                            placeholder="Email Address"
-                            {...register('email')}
-                            className="w-full pl-10 pr-3 py-2 bg-gray-800 bg-opacity-50 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-500 text-white placeholder-gray-400 transition duration-200"
-                        />
-                    </div> */}
 
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
@@ -87,17 +79,6 @@ const Login = () => {
                             />
                         </div>
                     </div>
-                    {/* <div className="relative mb-6">
-                        <div className="absolute inset-y-0 flex items-center pl-3 pointer-events-none">
-                            <Lock className="size-5 text-green-500 " />
-                        </div>
-                        <input
-                            type="password"
-                            placeholder="Password"
-                            {...register('password')}
-                            className="w-full pl-10 pr-3 py-2 bg-gray-800 bg-opacity-50 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-2 focus:ring-green-500 text-white placeholder-gray-400 transition duration-200"
-                        />
-                    </div> */}
                     <button
                         className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                         disabled={isLoading}

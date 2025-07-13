@@ -3,11 +3,12 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const http = require('http');
+const cookieParser = require('cookie-parser');
 const { Server } = require('socket.io');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger');
 
-require('./cron'); 
+require('./cron');
 
 const PORT = process.env.PORT || 5000;
 
@@ -16,10 +17,15 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors({ origin: '*' }));
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
+
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));    
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const server = http.createServer(app);
 

@@ -3,9 +3,12 @@ const bcrypt = require('bcryptjs');
 const sharp = require('sharp');
 const fs = require('fs');
 const User = require('../models/User');
-// const redisClient = require('../redisClient');
+const { v4: uuidv4 } = require('uuid');
+const SESSION_TTL = 24 * 60 * 60;
+const redisClient = require('../redisClient');
 
-const redisExpiration = process.env.REDIS_EXPIRATION;
+const REDIS_EXPIRATION = process.env.REDIS_EXPIRATION;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 exports.Register = async (req, res) => {
     const { username, password, email } = req.body;
@@ -40,25 +43,54 @@ exports.Login = async (req, res) => {
             return res.status(400).json({ error: 'Invalid credentials' });
         }
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '24h' });
+        const sessionId = uuidv4();
 
-        // await redisClient.setEx(token, redisExpiration, JSON.stringify({ userId: user._id }));
+        const payload = { userId: user._id, sessionId: sessionId, email: user.email, role: user.role };
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '24h' });
 
-        res.status(200).json({ message: 'Login successful', token });
+        const sessionData = {
+            userId: user._id,
+            email: user.email,
+            role: user.role,
+            loginTime: new Date().toISOString(),
+            lastActivity: new Date().toISOString()
+        };
+
+        // Store session in Redis
+        await redisClient.setEx(
+            `session:${sessionId}`,
+            parseInt(REDIS_EXPIRATION, 10),
+            JSON.stringify(sessionData)
+        );
+
+        // Store session ID in user's sessions set
+        await redisClient.sAdd(`user:${user.id}:sessions`, sessionId);
+        await redisClient.expire(`session:${sessionId}`, SESSION_TTL);
+
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false,      
+            sameSite: 'lax',   
+            maxAge: 24 * 60 * 60 * 1000  // 1 day in milliseconds
+        });
+
+        res.status(200).json({ message: 'Login successful', token, sessionId, success: true, user: { username: user.username, email: user.email, file: user.file, id: user._id } });
     } catch (error) {
+        console.log('Error during login:', error);
         res.status(500).json({ error: error?.message || 'Failed to login' });
     }
 };
 
 exports.getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
         }
 
         res.status(200).json({ username: user.username, email: user.email, file: user.file, id: user._id });
     } catch (error) {
+        console.log('Error during fetching profile : ', error);
         res.status(500).json({ error: error?.message || 'Failed to fetched profile' });
     }
 };
@@ -95,8 +127,13 @@ exports.updateProfile = async (req, res) => {
 
 exports.logout = async (req, res) => {
     try {
-        const token = req.headers.authorization?.split(" ")[1];
-        // if (token) await redisClient.del(token);
+        const sessionId = req.user.sessionId;
+        if (sessionId) {
+            await redisClient.del(`session:${sessionId}`);
+            await redisClient.sRem(`user:${decoded.userId}:sessions`, sessionId);
+        }
+
+        res.clearCookie('token');
         res.status(200).json({ message: "Logged out" });
     }
     catch (error) {

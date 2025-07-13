@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { API_URL, getToken } from '../constant';
+import { API_URL } from '../constant';
 
 export const useTask = create((set) => ({
     task: null,
@@ -13,7 +13,7 @@ export const useTask = create((set) => ({
 
         try {
             const todoResponse = await axios.post(`${API_URL}/task/createtasks`, payload, {
-                headers: { Authorization: `Bearer ${getToken()}` },
+                withCredentials: true
             });
             set({ task: todoResponse.data.user, isAuthenticated: true, isLoading: false });
             toast.success('Todo created successfully! 🎉 Welcome aboard!');
@@ -28,7 +28,7 @@ export const useTask = create((set) => ({
     getTask: async () => {
         set({ isLoading: true, error: null });
         try {
-            const todoResponse = await axios.get(`${API_URL}/task/gettasks`, { headers: { Authorization: `Bearer ${getToken()}` } });
+            const todoResponse = await axios.get(`${API_URL}/task/gettasks`, { withCredentials: true });
             set({ task: todoResponse.data });
             return true;
         } catch (error) {
@@ -42,7 +42,7 @@ export const useTask = create((set) => ({
         set({ isLoading: true, error: null });
         try {
             const todoResponse = await axios.delete(`${API_URL}/task/deletetasks/${id}`, {
-                headers: { Authorization: `Bearer ${getToken()}` },
+                withCredentials: true,
             });
             set({ task: todoResponse.data });
             return true;
@@ -57,7 +57,7 @@ export const useTask = create((set) => ({
         set({ isLoading: true, error: null });
         try {
             const todoResponse = await axios.put(`${API_URL}/task/updatetasks/${id}`, payload, {
-                headers: { Authorization: `Bearer ${getToken()}` },
+                withCredentials: true,
             });
             set({ task: todoResponse.data });
             return true;
@@ -71,7 +71,7 @@ export const useTask = create((set) => ({
     downloadTask: async () => {
         try {
             const response = await axios.get(`${API_URL}/task/downloadtask`, {
-                headers: { Authorization: `Bearer ${getToken()}` },
+                withCredentials: true,
                 responseType: 'blob',
             });
 

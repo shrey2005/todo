@@ -9,7 +9,7 @@ exports.createTask = async (req, res) => {
 
     try {
         const task = new Task({
-            userId: req.user._id,
+            userId: req.user.id,
             title,
             description,
             status,
@@ -36,7 +36,7 @@ exports.createTask = async (req, res) => {
 
 exports.getTasks = async (req, res) => {
     try {
-        const tasks = await Task.find({ userId: req.user._id });
+        const tasks = await Task.find({ userId: req.user.id });
 
         const filteredTasks = tasks.map((task) => {
             return {
@@ -51,6 +51,7 @@ exports.getTasks = async (req, res) => {
 
         res.status(200).json(filteredTasks);
     } catch (error) {
+        console.log('Error during fetching tasks : ', error);
         res.status(500).json({ error: error?.message || 'Internal server error' });
     }
 };
@@ -73,7 +74,7 @@ exports.updateTask = async (req, res) => {
 
         const io = req.app.get('io');
 
-        const task = await Task.findOneAndUpdate({ _id: req.params.id, userId: req.user._id }, update, { new: true });
+        const task = await Task.findOneAndUpdate({ _id: req.params.id, userId: req.user.id }, update, { new: true });
 
         if (!task) {
             return res.status(404).send('Task not found');
@@ -90,7 +91,7 @@ exports.updateTask = async (req, res) => {
 
 exports.deleteTask = async (req, res) => {
     try {
-        const task = await Task.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
+        const task = await Task.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
 
         if (!task) {
             return res.status(404).send('Task not found');
@@ -98,13 +99,14 @@ exports.deleteTask = async (req, res) => {
 
         res.status(200).json({ message: 'Task deleted successfully' });
     } catch (error) {
+        console.log('Error during deletion task : ', error);
         res.status(500).json({ error: error?.message || 'Internal server error' });
     }
 };
 
 exports.downloadTask = async (req, res) => {
     try {
-        const tasks = await Task.find({ userId: req.user._id });
+        const tasks = await Task.find({ userId: req.user.id });
 
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', 'attachment; filename=tasks.csv');

@@ -5,15 +5,14 @@ import Login from './page/Login';
 import Dashboard from './page/Dashboard';
 import Navbar from './components/Navbar';
 import ProfilePage from './page/Profile';
-import { getToken } from './constant';
-export const ProtectedRoute = ({ children }) => {
-    const token = getToken();
-    if (!token) {
-        return <Navigate to="/" replace />;
-    }
+// export const ProtectedRoute = ({ children }) => {
+//     const token = getToken();
+//     if (!token) {
+//         return <Navigate to="/" replace />;
+//     }
 
-    return children;
-};
+//     return children;
+// };
 
 function App() {
     return (
@@ -25,19 +24,23 @@ function App() {
                 <Route
                     path="/dashboard"
                     element={
-                        <ProtectedRoute>
+                        // <ProtectedRoute>
+                        <>
                             <Navbar />
                             <Dashboard />
-                        </ProtectedRoute>
+                        </>
+                        // </ProtectedRoute>
                     }
                 />
                 <Route
                     path="/profile"
                     element={
-                        <ProtectedRoute>
+                        // <ProtectedRoute>
+                        <>
                             <Navbar />
                             <ProfilePage />
-                        </ProtectedRoute>
+                        </>
+                        // </ProtectedRoute>
                     }
                 />
             </Routes>
