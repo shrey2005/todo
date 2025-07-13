@@ -100,7 +100,7 @@ export default function Register() {
                         </label>
                         {imageError && <p className="mt-1 text-sm text-red-600">{imageError.image}</p>}
                        
-                            <span className="text-xs text-gray-300">Click image to select</span> */}
+                            <span className="text-xs text-gray-300">Click image to select</span> 
                     </div>
 
                     {/* Full Name */}
