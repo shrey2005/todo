@@ -1,25 +1,18 @@
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Loader, LogIn } from 'lucide-react';
-import { useAuth } from '../store/useAuth';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { useAuth } from '../store/useAuth';
+
+const schema = yup.object().shape({
+    email: yup.string().required('Email is required').email('Invalid email address'),
+    password: yup.string().required('Password is required').min(6, 'Password must be at least 6 characters'),
+});
 
 const Login = () => {
-    const { isLoading, error, login } = useAuth();
+    const { isLoading, login } = useAuth();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        if (error === false) {
-            navigate('/dashboard');
-        }
-    }, [error, navigate]);
-
-    const schema = yup.object().shape({
-        email: yup.string().required('Email is required').email('Invalid email address'),
-        password: yup.string().required('Password is required').min(6, 'Password must be at least 6 characters'),
-    });
 
     const {
         register,
@@ -35,7 +28,10 @@ const Login = () => {
                 email: formData.email,
                 password: formData.password,
             };
-            await login(payload);
+            const result = await login(payload);
+            if (result.success) {
+                navigate('/dashboard');
+            }
         } catch (error) {
             console.log(error);
         }

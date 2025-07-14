@@ -18,7 +18,7 @@ const schema = yup.object().shape({
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function TaskDashboard() {
-    const { isLoading, isChecking, createTask, getTask, deleteTask, updateTask, task, downloadTask } = useTask();
+    const {  createTask, getTask, deleteTask, updateTask, task, downloadTask } = useTask();
 
     useEffect(() => {
         const handleTaskStatusUpdated = (updatedTask) => {
@@ -247,8 +247,7 @@ export default function TaskDashboard() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-pink-50">
-                        {task &&
-                            task.length > 0 &&
+                        {task && task.length > 0 ? (
                             task.map((t) => (
                                 <tr key={t.id} className="hover:bg-pink-50 transition">
                                     <td className="px-5 py-4 whitespace-nowrap">{t.title}</td>
@@ -272,8 +271,14 @@ export default function TaskDashboard() {
                                             </button>
                                         </div>
                                     </td>
-                                </tr>
-                            ))}
+                                </tr>))
+                             ) : (
+                            <tr>
+                                <td colSpan="4" className="px-5 py-8 text-center text-medium text-gray-500">
+                                    No tasks found.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>

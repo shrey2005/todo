@@ -32,7 +32,8 @@ export const useAuth = create((set) => ({
         try {
             const loginResponse = await axios.post(`${API_URL}/auth/login`, payload, { withCredentials: true });
             set({ user: loginResponse?.data?.user, isAuthenticated: true, isLoading: false, error: false });
-            // toast.success('Logged in successfully! 🎉 Welcome aboard!');
+
+            return { success: true, data: loginResponse.data };
         } catch (error) {
             console.error('Login error:', error?.response?.data?.error || error);
             set({ error: error?.response?.data?.error || 'Error Logging in', isLoading: false });
