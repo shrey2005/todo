@@ -20,7 +20,7 @@ exports.createTask = async (req, res) => {
         await task.save();
 
         await sendEmail({
-            to: 'jhon.doe@yopmail.com',
+            to: req.user.email,
             subject: 'Task Created Successfully',
             html: `Task Created with ${task.title}`,
         });
@@ -66,7 +66,7 @@ exports.updateTask = async (req, res) => {
         const { status, title } = req.body;
         if (status && status === 'completed') {
             await sendEmail({
-                to: 'jhon.doe@yopmail.com',
+                to: req.user.email,
                 subject: 'Task completed Successfully',
                 html: `Task completed with ${title}`,
             });
