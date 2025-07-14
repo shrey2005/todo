@@ -5,9 +5,9 @@ const fs = require('fs');
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         let dir = null;
-        if (req?.user?._id) {
-            dir = `uploads/${req.user._id}`;
-        } else {
+        if (req.url.startsWith('/createtasks')) {
+            dir = `uploads/${req.user.id}`;
+        } else if (req.url.startsWith('/profile')) {
             dir = 'uploads/profile';
         }
         if (!fs.existsSync(dir)) {
