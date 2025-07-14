@@ -24,11 +24,11 @@ const options = {
     ],
     servers: [
       {
-        url: 'http://localhost:3000', // Match your backend
+        url: 'http://localhost:3000',
       },
     ],
   },
-  apis: ['./swaggerroute/*.js'], // Adjust path to your route files
+  apis: ['./swaggerroute/*.js'], 
 };
 
 const swaggerSpec = swaggerJsdoc(options);
