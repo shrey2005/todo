@@ -33,6 +33,7 @@ export default function TaskDashboard() {
     const [file, setFile] = useState(null);
     const [previewFile, setPreviewFile] = useState(null);
     const [editFile, setEditFile] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);    
 
     const {
         register,
@@ -69,6 +70,7 @@ export default function TaskDashboard() {
 
     const onSubmit = async (data) => {
         try {
+            setIsSubmitting(true);
             const formData = new FormData();
 
             Object.entries(data).forEach(([key, value]) => {
@@ -95,10 +97,12 @@ export default function TaskDashboard() {
                 await createTask(payload);
                 await getTask();
             }
+            setIsSubmitting(false);
             setFile(null);
             setPreviewFile(null);
             reset();
         } catch (error) {
+            setIsSubmitting(false)
             console.log('Error thrown during task ', error);
         }
     };
@@ -224,6 +228,7 @@ export default function TaskDashboard() {
                     <button
                         type="submit"
                         className="bg-gradient-to-r from-fuchsia-500 to-pink-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-fuchsia-600 hover:to-pink-600 transition shadow"
+                        disabled={isSubmitting}
                     >
                         {editingIndex !== null ? 'Update Task' : 'Create Task'}
                     </button>

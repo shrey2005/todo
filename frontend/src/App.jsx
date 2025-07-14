@@ -1,21 +1,16 @@
-import { BrowserRouter as Router, Route, Routes, Link, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import Register from './page/Register';
 import Login from './page/Login';
 import Dashboard from './page/Dashboard';
 import Navbar from './components/Navbar';
 import ProfilePage from './page/Profile';
-// export const ProtectedRoute = ({ children }) => {
-//     const token = getToken();
-//     if (!token) {
-//         return <Navigate to="/" replace />;
-//     }
-
-//     return children;
-// };
+import { ProtectedRoute } from './router/ProtectedRoute';
+import { AuthProvider } from '../context/AuthContext';
 
 function App() {
     return (
+        // <AuthProvider>
         <Router>
             <ToastContainer />
             <Routes>
@@ -45,6 +40,7 @@ function App() {
                 />
             </Routes>
         </Router>
+        // </AuthProvider>
     );
 }
 

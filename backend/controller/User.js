@@ -56,14 +56,12 @@ exports.Login = async (req, res) => {
             lastActivity: new Date().toISOString()
         };
 
-        // Store session in Redis
         await redisClient.setEx(
             `session:${sessionId}`,
             parseInt(REDIS_EXPIRATION, 10),
             JSON.stringify(sessionData)
         );
 
-        // Store session ID in user's sessions set
         await redisClient.sAdd(`user:${user.id}:sessions`, sessionId);
         await redisClient.expire(`session:${sessionId}`, SESSION_TTL);
 
@@ -71,7 +69,7 @@ exports.Login = async (req, res) => {
             httpOnly: true,
             secure: false,      
             sameSite: 'lax',   
-            maxAge: 24 * 60 * 60 * 1000  // 1 day in milliseconds
+            maxAge: 24 * 60 * 60 * 1000
         });
 
         res.status(200).json({ message: 'Login successful', token, sessionId, success: true, user: { username: user.username, email: user.email, file: user.file, id: user._id } });
@@ -80,6 +78,14 @@ exports.Login = async (req, res) => {
         res.status(500).json({ error: error?.message || 'Failed to login' });
     }
 };
+
+// exports.validateSession = async (req, res) => {
+//     try {
+//         res.json({ valid: true });
+//     } catch (error) {
+//         res.status(500).json({ error: error?.message || 'Failed to validate session' });
+//     }
+// };
 
 exports.getProfile = async (req, res) => {
     try {
@@ -130,7 +136,7 @@ exports.logout = async (req, res) => {
         const sessionId = req.user.sessionId;
         if (sessionId) {
             await redisClient.del(`session:${sessionId}`);
-            await redisClient.sRem(`user:${decoded.userId}:sessions`, sessionId);
+            await redisClient.sRem(`user:${req.user.userId}:sessions`, sessionId);
         }
 
         res.clearCookie('token');
