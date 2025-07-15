@@ -7,24 +7,24 @@ const authMiddleware = async (req, res, next) => {
     try {
         const token = req.cookies.token || null
         if (!token) {
-            return res.status(401).send({ error: 'Authentication required: Token missing' });
+            return res.status(401).send({ valid: false, error: 'Authentication required: Token missing' });
         }
 
         const decoded = jwt.verify(token, JWT_SECRET);
         const { sessionId, userId } = decoded;
         if (!sessionId || !userId) {
-            return res.status(401).send({ message: 'Invalid session' });
+            return res.status(401).send({ valid: false, message: 'Invalid session' });
         }
 
         const sessionData = await redisClient.get(`session:${sessionId}`);
         if (!sessionData) {
-            return res.status(401).send({ message: 'Session expired' });
+            return res.status(401).send({ valid: false, message: 'Session expired' });
         }
 
         const session = JSON.parse(sessionData);
         session.lastActivity = new Date().toISOString();
 
-        await redisClient.setEx(`session:${sessionId}`,  parseInt(process.env.REDIS_EXPIRATION, 10), JSON.stringify(session));
+        await redisClient.setEx(`session:${sessionId}`, parseInt(process.env.REDIS_EXPIRATION, 10), JSON.stringify(session));
         req.user = {
             id: userId,
             email: session.email,
@@ -37,20 +37,20 @@ const authMiddleware = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('Authentication error:', error)
-       if (error.name === 'TokenExpiredError') {
-             res.status(401).json({ 
-                valid: false, 
-                message: 'Token expired' 
+        if (error.name === 'TokenExpiredError') {
+            res.status(401).json({
+                valid: false,
+                message: 'Token expired'
             });
         } else if (error.name === 'JsonWebTokenError') {
-             res.status(401).json({ 
-                valid: false, 
-                message: 'Invalid token' 
+            res.status(401).json({
+                valid: false,
+                message: 'Invalid token'
             });
         } else {
-             res.status(401).json({ 
-                valid: false, 
-                message: 'Authentication failed' 
+            res.status(401).json({
+                valid: false,
+                message: 'Authentication failed'
             });
         }
     }

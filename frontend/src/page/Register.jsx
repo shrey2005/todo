@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { CheckCircle, Mail, Lock, Upload, User } from 'lucide-react';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { useAuth } from '../store/useAuth';
 import PasswordStrength from '../components/PasswordStrength';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
 
 const schema = yup.object().shape({
     email: yup.string().required('Email is required').email('Invalid email address'),

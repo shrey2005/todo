@@ -45,6 +45,7 @@ export const useTask = create((set) => ({
                 withCredentials: true,
             });
             set({ task: todoResponse.data });
+            toast.success('Todo deleted successfully!');    
             return true;
         } catch (error) {
             set({ error: error.response.data.message || 'Error Todo Deletion', isLoading: false });

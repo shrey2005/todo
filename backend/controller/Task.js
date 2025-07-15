@@ -1,7 +1,7 @@
 const Task = require('../models/Task');
-const sendEmail = require('../utils/mailer');
 const dayjs = require('dayjs');
 const { writeToStream } = require('@fast-csv/format');
+const sendEmail = require('../utils/mailer');
 
 exports.createTask = async (req, res) => {
     const { title, description, status, dueDate } = req.body;
@@ -64,6 +64,11 @@ exports.updateTask = async (req, res) => {
         }
 
         const { status, title } = req.body;
+
+        const io = req.app.get('io');
+
+        const task = await Task.findOneAndUpdate({ _id: req.params.id, userId: req.user.id }, update, { new: true });
+
         if (status && status === 'completed') {
             await sendEmail({
                 to: req.user.email,
@@ -71,11 +76,7 @@ exports.updateTask = async (req, res) => {
                 html: `Task completed with ${title}`,
             });
         }
-
-        const io = req.app.get('io');
-
-        const task = await Task.findOneAndUpdate({ _id: req.params.id, userId: req.user.id }, update, { new: true });
-
+        
         if (!task) {
             return res.status(404).send('Task not found');
         }

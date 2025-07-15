@@ -79,13 +79,13 @@ exports.Login = async (req, res) => {
     }
 };
 
-// exports.validateSession = async (req, res) => {
-//     try {
-//         res.json({ valid: true });
-//     } catch (error) {
-//         res.status(500).json({ error: error?.message || 'Failed to validate session' });
-//     }
-// };
+exports.validateSession = async (req, res) => {
+    try {
+        res.json({ valid: true });
+    } catch (error) {
+        res.status(500).json({ error: error?.message || 'Failed to validate session' });
+    }
+};
 
 exports.getProfile = async (req, res) => {
     try {

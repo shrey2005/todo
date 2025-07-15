@@ -6,11 +6,9 @@ import Dashboard from './page/Dashboard';
 import Navbar from './components/Navbar';
 import ProfilePage from './page/Profile';
 import { ProtectedRoute } from './router/ProtectedRoute';
-import { AuthProvider } from '../context/AuthContext';
 
 function App() {
     return (
-        // <AuthProvider>
         <Router>
             <ToastContainer />
             <Routes>
@@ -19,28 +17,23 @@ function App() {
                 <Route
                     path="/dashboard"
                     element={
-                        // <ProtectedRoute>
-                        <>
+                        <ProtectedRoute>
                             <Navbar />
                             <Dashboard />
-                        </>
-                        // </ProtectedRoute>
+                        </ProtectedRoute>
                     }
                 />
                 <Route
                     path="/profile"
                     element={
-                        // <ProtectedRoute>
-                        <>
+                        <ProtectedRoute>
                             <Navbar />
                             <ProfilePage />
-                        </>
-                        // </ProtectedRoute>
+                         </ProtectedRoute>
                     }
                 />
             </Routes>
         </Router>
-        // </AuthProvider>
     );
 }
 
