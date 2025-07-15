@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../store/useAuth';
 import defaultAvatar from '../assets/default-avatar.jpg';
 import { UPLOAD_URL } from '../constant';
@@ -33,6 +33,7 @@ const EditSVG = () => {
 };
 export default function ProfilePage() {
     const { profile, fetchProfile, updateProfile, loading } = useAuth();
+    const fileInputRef = useRef(null);
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(defaultAvatar);
 
@@ -58,6 +59,18 @@ export default function ProfilePage() {
         await updateProfile(formData, profile?.id);
         await fetchProfile();
         setFile(null);
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFile(file);
+            setPreview(URL.createObjectURL(file));
+        }
+    };
+
+    const triggerFileInput = () => {
+        fileInputRef.current?.click();
     };
 
     return (
@@ -100,21 +113,18 @@ export default function ProfilePage() {
                     ) : (
                         <>
                             <button
-                                onClick={() => document.getElementById('profile-file-input').click()}
+                                onClick={triggerFileInput}
                                 className="absolute bottom-2 text-base right-2 bg-blue-600 text-white rounded-full p-2 shadow hover:bg-blue-700 transition"
                                 title="Edit Profile Picture"
                             >
                                 <EditSVG />
                             </button>
                             <input
-                                id="profile-file-input"
+                                ref={fileInputRef}
                                 type="file"
                                 accept="image/*"
                                 hidden
-                                onChange={(e) => {
-                                    setFile(e.target.files[0]);
-                                    setPreview(URL.createObjectURL(e.target.files[0]));
-                                }}
+                                onChange={handleFileChange}
                             />
                         </>
                     )}

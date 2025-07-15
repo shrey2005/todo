@@ -63,7 +63,6 @@ exports.Login = async (req, res) => {
         );
 
         await redisClient.sAdd(`user:${user.id}:sessions`, sessionId);
-        await redisClient.expire(`session:${sessionId}`, SESSION_TTL);
 
         res.cookie('token', token, {
             httpOnly: true,
